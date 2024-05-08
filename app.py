@@ -7,8 +7,8 @@ from flask_mail import Mail, Message
 import string
 
 
-application = Flask(__name__)
-CORS(application)  # Enable CORS for all routes
+app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 client = Client()
 
@@ -19,21 +19,21 @@ db_client = MongoClient(uri)
 db = db_client['user_database']
 users_collection = db['users']
 
-application.config['MAIL_SERVER'] = 'smtp.gmail.com'
-application.config['MAIL_PORT'] = 587
-application.config['MAIL_USE_TLS'] = True
-application.config['MAIL_USE_SSL'] = False
-application.config['MAIL_USERNAME'] = 'himanshu.k822887@gmail.com'
-application.config['MAIL_PASSWORD'] = 'vqeq nzsi hlzx sohb'
-application.config['MAIL_DEFAULT_SENDER'] = 'BrainWave'
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'himanshu.k822887@gmail.com'
+app.config['MAIL_PASSWORD'] = 'vqeq nzsi hlzx sohb'
+app.config['MAIL_DEFAULT_SENDER'] = 'BrainWave'
 
-mail = Mail(application)
+mail = Mail(app)
 
-@application.route('/')
+@app.route('/')
 def open():
     return 'API Request Success'
 
-@application.route('/generate_response', methods=['POST'])
+@app.route('/generate_response', methods=['POST'])
 def generate_response():
     content = request.json.get('content')
     
@@ -52,7 +52,7 @@ def generate_response():
         return jsonify({"error": str(e)}), 500
     
 
-@application.route('/generate_gpt', methods=['POST'])
+@app.route('/generate_gpt', methods=['POST'])
 def generate_gpt():
     content = request.json.get('content')
     
@@ -72,7 +72,7 @@ def generate_gpt():
 
 
 # Signup API
-@application.route('/signup', methods=['POST'])
+@app.route('/signup', methods=['POST'])
 def signup():
     data = request.json
     username = data['username']
@@ -89,7 +89,7 @@ def signup():
     return jsonify({'message': 'User created successfully'}), 201
 
 # Login API
-@application.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login():
     data = request.json
     email = data['email']
@@ -106,7 +106,7 @@ def login():
 
 
 # API endpoint for getting user profile
-@application.route('/get_profile', methods=['GET'])
+@app.route('/get_profile', methods=['GET'])
 def get_profile():
     username = request.args.get('username')
 
@@ -118,7 +118,7 @@ def get_profile():
         return jsonify({'error': 'User not found'}), 404
     
 # API endpoint for updating user password
-@application.route('/update_password', methods=['POST'])
+@app.route('/update_password', methods=['POST'])
 def update_password():
     # Extract username and new password from form data
     username = request.form.get('username')
@@ -135,7 +135,7 @@ def update_password():
 
 def send_email(email, email_subject, email_content):
     try:
-        msg = Message(email_subject, sender=application.config['MAIL_USERNAME'], recipients=[email])
+        msg = Message(email_subject, sender=app.config['MAIL_USERNAME'], recipients=[email])
         msg.body = email_content
         mail.send(msg)
         print("Email sent successfully!")
@@ -149,7 +149,7 @@ def generate_password(length=8):
     return ''.join(random.choice(characters) for i in range(length))
 
 
-@application.route('/forgot-password', methods=['POST'])
+@app.route('/forgot-password', methods=['POST'])
 def forgot_password():
     data = request.json
     email = data.get('email')
@@ -174,4 +174,4 @@ def forgot_password():
 
 
 if __name__ == '__main__':
-    application.run()
+    app.run()
